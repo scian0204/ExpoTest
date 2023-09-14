@@ -1,4 +1,4 @@
-# Expo Notification을 이용한 리액트 네이티브 푸시/로컬 알림 테스트 프로젝트
+# Expo Notification을 이용한 리액트 네이티브 웹뷰, 푸시/로컬 알림 구현 테스트 프로젝트
 
 ## 프로젝트 생성 및 초기설정
 
@@ -12,8 +12,17 @@
 8. `eas init --id [projectId]`
 9. `expo install expo-notifications`
 10. `expo install expo-constants`
+11. `npm install react-native-webview`
 
-## 공통
+---
+
+## 웹뷰
+
+- 기존과 같음
+
+## 로컬/Push 알림
+
+### 공통
 
 - 권한 얻기
 
@@ -60,7 +69,7 @@
   }, []);
   ```
 
-## 로컬 알림
+### 로컬 알림
 
 1. 알림 보낼 비동기 함수
 
@@ -107,7 +116,7 @@
    });
    ```
 
-## Push 알림
+### Push 알림
 
 - 실기기로 테스트해야 함
 
