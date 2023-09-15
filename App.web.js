@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import MyWebView from './components/MyWebView';
 import {
   RefreshControl,
   SafeAreaView,
@@ -15,8 +16,8 @@ export default function App() {
     container: {
       flex: 1,
       width: width,
-      justifyContent: 'center',
-      alignItems: 'center',
+      // justifyContent: 'center',
+      // alignItems: 'center',
     },
   });
 
