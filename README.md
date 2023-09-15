@@ -18,7 +18,7 @@
 
 ## 웹뷰
 
-- 기존과 같음
+- [기존과 같음](https://github.com/scian0204/LearnNative/blob/master/README.md)
 
 ## 로컬/Push 알림
 
@@ -82,17 +82,81 @@
          data: { data: 'goes here' },
        },
        trigger: { seconds: 1 },
-       /**
-        * 트리거 Ex)
-        * 1. 특정 날짜/시간
-        * 2. 특정 시간 반복
-        * ...
-        */
      });
    }
    ```
 
-2. 함수 실행할 버튼
+- 트리거 종류
+  - 알림 즉시 전달
+    - ```Typescript
+      type ChannelAwareTriggerInput = {
+        channelId: string;
+      };
+      ```
+  - 지정 날짜에 한 번만 전달
+    - ```Typescript
+      type DateTriggerInput = number | Date | {
+        channelId?: string;
+        date: Date | number; // number로 전달 시 유닉스 타임스탬프로 해석
+      }
+      ```
+  - 초 단위로 시간 경과 후 한 번 또는 여러 번 전달
+    - ```Typescript
+      interface TimeIntervalTriggerInput {
+        channelId?: string;
+        repeats?: boolean; // IOS에서 참인 경우 시간 간격이 60초 이상이어야 함
+        seconds: number;
+      }
+      ```
+  - 하루에 한 번씩 전달
+    - ```Typescript
+      interface DailyTriggerInput {
+        channelId?: string;
+        hour: number;
+        minute: number;
+        repeats: true;
+      }
+      ```
+  - 매주 한 번씩 전달
+    - ```Typescript
+      interface WeeklyTriggerInput {
+        channelId?: string;
+        weekday: number; // 1 ~ 7, 1: 일요일
+        hour: number;
+        minute: number;
+        repeats: true;
+      }
+      ```
+  - 매년 한 번씩 전달
+    - ```Typescript
+      interface YearlyTriggerInput {
+        channelId?: string;
+        day: number;
+        month: number;
+        hour: number;
+        minute: number;
+        repeats: true;
+      }
+      ```
+      - 모든 속성은 JavaScript 날짜 범위로 지정됨
+  - 날짜 구성 요소가 지정된 값과 일치 시 한 번 또는 여러번 전달(IOS)
+    - ```Typescript
+      type CalendarTriggerInput = {
+        timezone?: string;
+        year?: number;
+        month?: number;
+        weekday?: number;
+        weekOfMonth?: number;
+        weekOfYear?: number;
+        weekdayOrdinal?: number;
+        day?: number;
+        hour?: number;
+        minute?: number;
+        second?: number;
+      }
+      ```
+
+1. 함수 실행할 버튼
 
    ```jsx
    <Button
@@ -103,7 +167,7 @@
    />
    ```
 
-3. 알림 받을 핸들러
+2. 알림 받을 핸들러
 
    ```javascript
    // App 함수 바깥 최상단에 배치
