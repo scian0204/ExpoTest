@@ -186,3 +186,33 @@
 
 1. [Expo Push알림 테스트서비스](https://expo.dev/notifications)
 2. 공통에서 얻은 토큰(`ExponentPushToken[TOKEN]` 의 형태), `Title`, `Body` 등을 작성 후 하단에 `Send` 버튼으로 전송
+
+### AsyncStorage
+
+- `React`의 `localStorage` 대신 사용
+- 특징
+  - 기본적으로 문자열만 저장 가능하여 객체를 저장할때는 `JSON.stringify()`함수를 사용하여 저장하고 받을때는 `JSON.parse()`함수를 이용하여 받음
+  - `localStorage`와 다르게 비동기로 실행됨
+- 설치
+  - `expo install @react-native-async-storage/async-storage`
+- 사용방법
+  - `get`
+    - ```Javascript
+      const getData = async () => {
+        const value = await AsyncStorage.getItem('listValue');
+        return value != null ? JSON.parse(value) : [];
+      };
+      getData().then((value) => console.log(value));
+      ```
+    - ```Javascript
+      AsyncStorage.getItem('listValue', (err, data)=>{
+        const value = data != null ? JSON.parse(data) : [];
+        console.log(value);
+      });
+      ```
+  - `set`
+    - ```Javascript
+      async () => {
+        await AsyncStorage.setItem('listValue', JSON.stringify(listValue));
+      };
+      ```
