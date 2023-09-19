@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Text,
-  View,
-  Button,
-  Platform,
-  Alert,
-  SafeAreaView,
-} from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Platform } from 'react-native';
+import AWS from 'aws-sdk';
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  AWS_ACCESS_KEY,
+  AWS_SECRET_ACCESS_KEY,
+  REGION,
+  TOPIC_ARN,
+  PLATFORM_ARN,
+  IOS_PLATFORM_ARN,
+  EXPO_PROJECT_ID,
+} from '@env';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -21,97 +22,89 @@ Notifications.setNotificationHandler({
 });
 
 export default function App() {
+  const [resultMsg, setResultMsg] = useState('');
   useEffect(() => {
-    async function configurePushNotifications() {
-      if (Platform.OS === 'android') {
-        Notifications.setNotificationChannelAsync('default', {
-          name: 'default',
-          importance: Notifications.AndroidImportance.DEFAULT,
+    // 권한 확인 밑 묻기
+    const requestUserPermission = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to receive notifications was denied.');
+      }
+    };
+
+    // AWS SNS 연결
+    const registerDeviceTokenWithSNS = async () => {
+      try {
+        // 디바이스 토큰 얻기
+        const deviceToken = (
+          await Notifications.getDevicePushTokenAsync({
+            projectId: EXPO_PROJECT_ID,
+          })
+        ).data;
+
+        // AWS 로그인?
+        AWS.config.update({
+          region: REGION,
+          accessKeyId: AWS_ACCESS_KEY,
+          secretAccessKey: AWS_SECRET_ACCESS_KEY,
         });
+
+        // AWS SNS 객체 생성
+        const SNS = new AWS.SNS({ correctClockSkew: true });
+
+        // 엔드포인트 생성 시 필요한 정보
+        const platformApplicationArn = PLATFORM_ARN;
+        const endpointParams = {
+          PlatformApplicationArn: platformApplicationArn, // android: FCM / ios: APNs (aws에서 각 서비스의 API등록하고 생성)
+          Token: deviceToken,
+          CustomUserData: Platform.OS,
+        };
+        // 엔드포인트 생성
+        const createEndpointResponse = await SNS.createPlatformEndpoint(
+          endpointParams
+        ).promise();
+
+        // 해당 엔드포인트 ARN 얻기
+        const endpointArn = createEndpointResponse.EndpointArn;
+
+        // 구독에 필요한 정보
+        const subscribeParams = {
+          TopicArn: TOPIC_ARN, // 구독할 주제의 ARN
+          Protocol: 'Application',
+          Endpoint: endpointArn,
+        };
+
+        // 구독
+        await SNS.subscribe(subscribeParams).promise();
+
+        const msg = 'Successfully registered device with AWS SNS.';
+        console.log(msg);
+        setResultMsg(msg);
+      } catch (error) {
+        const msg = 'Failed to register device with AWS SNS: ' + error;
+        console.log(msg);
+        setResultMsg(msg);
       }
-      const { status } = await Notifications.getPermissionsAsync();
-      let finalStatus = status;
-
-      if (finalStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus !== 'granted') {
-        Alert.alert(
-          'Permission required',
-          'Push notifications need the appropriate permissions.'
-        );
-        return;
-      }
-      const pushTokenData = await Notifications.getExpoPushTokenAsync({
-        projectId: Constants.expoConfig.extra.projectId,
-      });
-      console.log(pushTokenData);
-    }
-
-    configurePushNotifications();
-  }, []);
-
-  const [dateList, setDateList] = useState(new Array());
-  useEffect(() => {
-    AsyncStorage.clear();
-    const getData = async () => {
-      const value = await AsyncStorage.getItem('dateList');
-      return value != null ? JSON.parse(value) : [];
     };
-    getData().then((value) => setDateList(value));
+
+    requestUserPermission();
+    registerDeviceTokenWithSNS();
   }, []);
-  const [open, setOpen] = useState(false);
-  const dateChangeHandler = (event, date) => {
-    const newList = [...dateList];
-    newList.push(date);
-    async () => {
-      await AsyncStorage.setItem('dateList', JSON.stringify(newList));
-    };
-    setDateList(newList);
-    setOpen(false);
-  };
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'space-around',
-      }}>
-      {dateList.map((date, i) => {
-        return (
-          <Text key={i} style={{ color: 'black', fontSize: 20 }}>
-            {date.toLocaleString()}
-          </Text>
-        );
-      })}
-      <DateTimePicker
-        style={{ flex: 1 }}
-        value={new Date()}
-        mode="datetime"
-        display="spinner"
-        onChange={dateChangeHandler}
-      />
-      <Button title="시간입력" onPress={() => setOpen(true)} />
-      {/* <Button
-        title="Press to schedule a notification"
-        onPress={async () => {
-          await schedulePushNotification();
-        }}
-      /> */}
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text>AWS SNS Demo</Text>
+      <Text>{resultMsg}</Text>
+      <StatusBar style="auto" />
+    </View>
   );
 }
 
-async function schedulePushNotification() {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: '로컬 알림 테스트',
-      body: '로컬 알림 테스트123',
-      sound: true,
-    },
-    trigger: { seconds: 1, channelId: 'default' },
-  });
-}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
