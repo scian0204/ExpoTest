@@ -1,17 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Platform } from 'react-native';
-import AWS from 'aws-sdk';
 import * as Notifications from 'expo-notifications';
-import {
-  AWS_ACCESS_KEY,
-  AWS_SECRET_ACCESS_KEY,
-  REGION,
-  TOPIC_ARN,
-  PLATFORM_ARN,
-  IOS_PLATFORM_ARN,
-  EXPO_PROJECT_ID,
-} from '@env';
+import { EXPO_PROJECT_ID } from '@env';
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
@@ -44,41 +35,6 @@ export default function App() {
             projectId: EXPO_PROJECT_ID,
           })
         ).data;
-
-        // // AWS 로그인?
-        // AWS.config.update({
-        //   region: REGION,
-        //   accessKeyId: AWS_ACCESS_KEY,
-        //   secretAccessKey: AWS_SECRET_ACCESS_KEY,
-        // });
-
-        // // AWS SNS 객체 생성
-        // const SNS = new AWS.SNS({ correctClockSkew: true });
-
-        // // 엔드포인트 생성 시 필요한 정보
-        // const platformApplicationArn = PLATFORM_ARN;
-        // const endpointParams = {
-        //   PlatformApplicationArn: platformApplicationArn, // android: FCM / ios: APNs (aws에서 각 서비스의 API등록하고 생성)
-        //   Token: deviceToken,
-        //   CustomUserData: Platform.OS,
-        // };
-        // // 엔드포인트 생성
-        // const createEndpointResponse = await SNS.createPlatformEndpoint(
-        //   endpointParams
-        // ).promise();
-
-        // // 해당 엔드포인트 ARN 얻기
-        // const endpointArn = createEndpointResponse.EndpointArn;
-
-        // // 구독에 필요한 정보
-        // const subscribeParams = {
-        //   TopicArn: TOPIC_ARN, // 구독할 주제의 ARN
-        //   Protocol: 'Application',
-        //   Endpoint: endpointArn,
-        // };
-
-        // // 구독
-        // await SNS.subscribe(subscribeParams).promise();
 
         const msg = '토큰 발급 완료';
         setResultMsg(msg);
