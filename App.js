@@ -12,6 +12,9 @@ import {
   IOS_PLATFORM_ARN,
   EXPO_PROJECT_ID,
 } from '@env';
+import axios from 'axios';
+
+axios.defaults.withCredentials = true;
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -42,47 +45,71 @@ export default function App() {
           })
         ).data;
 
-        // AWS 로그인?
-        AWS.config.update({
-          region: REGION,
-          accessKeyId: AWS_ACCESS_KEY,
-          secretAccessKey: AWS_SECRET_ACCESS_KEY,
-        });
+        // // AWS 로그인?
+        // AWS.config.update({
+        //   region: REGION,
+        //   accessKeyId: AWS_ACCESS_KEY,
+        //   secretAccessKey: AWS_SECRET_ACCESS_KEY,
+        // });
 
-        // AWS SNS 객체 생성
-        const SNS = new AWS.SNS({ correctClockSkew: true });
+        // // AWS SNS 객체 생성
+        // const SNS = new AWS.SNS({ correctClockSkew: true });
 
-        // 엔드포인트 생성 시 필요한 정보
-        const platformApplicationArn = PLATFORM_ARN;
-        const endpointParams = {
-          PlatformApplicationArn: platformApplicationArn, // android: FCM / ios: APNs (aws에서 각 서비스의 API등록하고 생성)
-          Token: deviceToken,
-          CustomUserData: Platform.OS,
-        };
-        // 엔드포인트 생성
-        const createEndpointResponse = await SNS.createPlatformEndpoint(
-          endpointParams
-        ).promise();
+        // // 엔드포인트 생성 시 필요한 정보
+        // const platformApplicationArn = PLATFORM_ARN;
+        // const endpointParams = {
+        //   PlatformApplicationArn: platformApplicationArn, // android: FCM / ios: APNs (aws에서 각 서비스의 API등록하고 생성)
+        //   Token: deviceToken,
+        //   CustomUserData: Platform.OS,
+        // };
+        // // 엔드포인트 생성
+        // const createEndpointResponse = await SNS.createPlatformEndpoint(
+        //   endpointParams
+        // ).promise();
 
-        // 해당 엔드포인트 ARN 얻기
-        const endpointArn = createEndpointResponse.EndpointArn;
+        // // 해당 엔드포인트 ARN 얻기
+        // const endpointArn = createEndpointResponse.EndpointArn;
 
-        // 구독에 필요한 정보
-        const subscribeParams = {
-          TopicArn: TOPIC_ARN, // 구독할 주제의 ARN
-          Protocol: 'Application',
-          Endpoint: endpointArn,
-        };
+        // // 구독에 필요한 정보
+        // const subscribeParams = {
+        //   TopicArn: TOPIC_ARN, // 구독할 주제의 ARN
+        //   Protocol: 'Application',
+        //   Endpoint: endpointArn,
+        // };
 
-        // 구독
-        await SNS.subscribe(subscribeParams).promise();
+        // // 구독
+        // await SNS.subscribe(subscribeParams).promise();
 
-        const msg = 'Successfully registered device with AWS SNS.';
-        console.log(msg);
+        const msg = '토큰 발급 완료';
         setResultMsg(msg);
+
+        const formData = new FormData();
+        formData.append('deviceToken', deviceToken);
+        formData.append('os', Platform.OS);
+
+        axios
+          .post(
+            'http://192.168.5.182:8080/api/sns/subscribe',
+            {
+              deviceToken: deviceToken,
+              os: Platform.OS,
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          )
+          .then((res) => {
+            setResultMsg(res.data);
+          })
+          .catch((res) => {
+            setResultMsg(
+              '요청실패 || msg: ' + res.message + ' || code: ' + res.code
+            );
+          });
       } catch (error) {
-        const msg = 'Failed to register device with AWS SNS: ' + error;
-        console.log(msg);
+        const msg = '토큰 발급 실패' + error;
         setResultMsg(msg);
       }
     };

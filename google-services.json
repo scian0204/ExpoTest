@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "853981069305",
+    "project_id": "test-cd5da",
+    "storage_bucket": "test-cd5da.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:853981069305:android:beca865f1d41706f89c728",
+        "android_client_info": {
+          "package_name": "com.datasolution.pushtest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBluaGAEN773mazO_QQAjHEb5-jJlXOJvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:853981069305:android:ed0b559a4101fcb589c728",
+        "android_client_info": {
+          "package_name": "com.pushtest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBluaGAEN773mazO_QQAjHEb5-jJlXOJvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

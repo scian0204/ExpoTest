@@ -12,6 +12,7 @@
     "@react-native-async-storage/async-storage": "1.18.2",
     "@react-native-community/datetimepicker": "7.2.0",
     "aws-sdk": "^2.1460.0",
+    "axios": "^1.5.0",
     "expo": "~49.0.10",
     "expo-constants": "~14.4.2",
     "expo-device": "~5.4.0",
