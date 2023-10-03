@@ -45,7 +45,8 @@
         {
           "android:usesCleartextTraffic": true
         }
-      ]
+      ],
+      ["./plugins/withAndroidQueriesAttributes"]
     ],
     "extra": {
       "eas": {

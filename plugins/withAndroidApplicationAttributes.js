@@ -4,17 +4,17 @@ function addAttributesToApplication(androidManifest, attributes) {
   const { manifest } = androidManifest;
 
   if (!Array.isArray(manifest['application'])) {
-    console.warn(
-      'withAndroidApplicationAttributes: No manifest.application array?'
-    );
     return androidManifest;
   }
 
   const application = manifest['application'].find(
     (item) => item.$['android:name'] === '.MainApplication'
   );
+
+  console.log(manifest);
+  console.log(application);
+
   if (!application) {
-    console.warn('withAndroidApplicationAttributes: No .MainApplication?');
     return androidManifest;
   }
 
