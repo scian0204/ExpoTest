@@ -5,18 +5,19 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
   useWindowDimensions,
   Platform,
   BackHandler,
+  StatusBar,
 } from 'react-native';
 
-export default function App() {
+export default function AppWeb() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       width: width,
-      // justifyContent: 'center',
+      alignContent: 'flex-end',
+      // justifyContent: 'flex-end',
       // alignItems: 'center',
     },
   });
@@ -58,6 +59,7 @@ export default function App() {
           contentContainerStyle={{
             flex: 1,
             width: width,
+            marginTop: StatusBar.currentHeight,
           }}
           refreshControl={
             <RefreshControl

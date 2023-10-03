@@ -1,9 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Platform } from 'react-native';
+import { StyleSheet, Platform, Alert } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { EXPO_PROJECT_ID } from '@env';
 import axios from 'axios';
+import AppWeb from './AppWeb';
 
 axios.defaults.withCredentials = true;
 
@@ -38,10 +38,7 @@ export default function App() {
 
         const msg = '토큰 발급 완료';
         setResultMsg(msg);
-
-        const formData = new FormData();
-        formData.append('deviceToken', deviceToken);
-        formData.append('os', Platform.OS);
+        // Alert.alert(msg);
 
         axios
           .post(
@@ -57,15 +54,19 @@ export default function App() {
             }
           )
           .then((res) => {
-            setResultMsg(res.data);
+            const msg = `요청 성공 || msg: ${res.data}`;
+            Alert.alert(msg);
+            setResultMsg(msg);
           })
           .catch((res) => {
-            setResultMsg(
-              '요청실패 || msg: ' + res.message + ' || code: ' + res.code
-            );
+            const msg =
+              '요청실패 || msg: ' + res.message + ' || code: ' + res.code;
+            Alert.alert(msg);
+            setResultMsg(msg);
           });
       } catch (error) {
-        const msg = '토큰 발급 실패' + error;
+        const msg = '토큰 발급 실패 || msg: ' + error;
+        Alert.prompt(msg);
         setResultMsg(msg);
       }
     };
@@ -74,13 +75,7 @@ export default function App() {
     registerDeviceTokenWithSNS();
   }, []);
 
-  return (
-    <View style={styles.container}>
-      <Text>AWS SNS Demo</Text>
-      <Text>{resultMsg}</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  return <AppWeb />;
 }
 
 const styles = StyleSheet.create({
